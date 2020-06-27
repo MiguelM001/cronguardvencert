@@ -18,6 +18,7 @@
 #  durante el periodo y el personal especificado por el usuario
 
 # NOTA: rango de meses, ¿ lista ? del 1..
+# NOTA: algoritmo de rango de meses debe definir si es par o impar y activar un swiche ?
 
 
 import calendar
@@ -127,7 +128,7 @@ class PruebaRectangulo(Papel):
 
 ############################ INICIO DE LA CLASE TABLA #####################################
 
-class Tabla(Papel):
+class Tabla(Papel):# Hereda de la clase Papel
 
 	def __init__(self, pPapel, pTitulo, rAncho, rLargo, tFilas, tColumnas ): # 	  constructor clase PruebaRectangulo
 		Papel.__init__(self, pPapel, pTitulo ) #  constructor clase Papel
@@ -147,7 +148,12 @@ class Tabla(Papel):
 		#self.inicioHorizontal= 27.635
 		#self.finalHorizontal= 573.635
 
-	def dibujarTabla(self, puntero): # crear argumento llamado puntero
+	def dibujarTabla(self, puntero): # crear argumento llamado puntero para definir la ubicacion de la tabla
+
+		filasLista= list()# lista vacia del calendario
+		columnasLista= list()# lista vacia del calendario
+		filasListaNombres= list() # lista vacia del personal
+		columnasListaNombres= list()# lista vacia del personal
 
 		iVertical= self.altura - puntero # inicio vertical /  argumento puntero
 		iHorizontal= ( self.ancho - self.recAncho ) / 2 # inicio horizontal
@@ -165,12 +171,12 @@ class Tabla(Papel):
 			fVertical-= resto # el resto de la division es el relleno
 			#sumaVerticales-= resto
 			if( contFilas < self.tamanioFilas):
-				self.columnasListaNombres.append(sumaVerticales)#SEGUNDA TABLA  BORRAR ?
-			self.columnasLista.append(sumaVerticales)
+				columnasListaNombres.append(sumaVerticales)#SEGUNDA TABLA  BORRAR ?
+			columnasLista.append(sumaVerticales)
 			sumaVerticales-= resto #comentar esta linea para redefinir la posicion
 			contFilas-= 1
-		self.columnasListaNombres.append(sumaVerticales)
-		self.columnasLista.append(sumaVerticales)
+		columnasListaNombres.append(sumaVerticales)
+		columnasLista.append(sumaVerticales)
 
 		contColumnas= self.tamanioColumnas
 		sumaHorizontales= iHorizontal
@@ -179,18 +185,18 @@ class Tabla(Papel):
 			resto = fHorizontal / contColumnas
 			fHorizontal-= resto # el resto de la division es el relleno
 			if( contColumnas >= (self.tamanioColumnas - 1)):# SEGUNDA TABLA  BORRAR ?
-				self.filasListaNombres.append(sumaHorizontales) # SEGUNDA TABLA  BORRAR ?
+				filasListaNombres.append(sumaHorizontales) # SEGUNDA TABLA  BORRAR ?
 			sumaHorizontales+= resto
-			self.filasLista.append(sumaHorizontales) # llenar lista del calendario
+			filasLista.append(sumaHorizontales) # llenar lista del calendario
 			#sumaHorizontales+= resto #comentar esta linea para redefinir la posicion
 			contColumnas-= 1
-		self.filasLista.append(sumaHorizontales)
+		filasLista.append(sumaHorizontales)
 
 # FIN CICLOS QUE OBLIGAN EL CRECIMIENTO DINAMICO DE LAS GRILLAS CONSERVANDO EL TAMAÑO DE LA TABLA		
 #--------------------------------------------------------------------------------------------
 		
-		self.pdf.grid(self.filasListaNombres,self.columnasListaNombres)# construye tabla vacia para el personal #SEGUNDA TABLA  BORRAR ?
-		self.pdf.grid(self.filasLista, self.columnasLista)# construye tabla vacia para el calendario
+		self.pdf.grid(filasListaNombres, columnasListaNombres)# construye tabla vacia para el personal #SEGUNDA TABLA  BORRAR ?
+		self.pdf.grid(filasLista, columnasLista)# construye tabla vacia para el calendario
 		
 		#debugear
 		#print("FILA LISTA: "+str(self.filasLista))
@@ -199,7 +205,12 @@ class Tabla(Papel):
 		#print("COLUMNAS LISTA NOMBRES: "+str(self.columnasListaNombres))
 		#debugear
 
-		self.limpiarListas() #subrutina que limpia las listas
+		self.filasLista= filasLista
+		self.columnasLista= columnasLista
+		self.filasListaNombres= filasListaNombres
+		self.columnasListaNombres= columnasListaNombres
+
+		#self.limpiarListas() #subrutina que limpia las listas
 
 	
 	def dibujarUnaTabla(self):
@@ -208,13 +219,13 @@ class Tabla(Papel):
 	def dibujarDosTabla(self):
 		self.dibujarTabla(80-0) #  80 desde el inicio
 		self.dibujarTabla(270+0) # (380 / 2)  =  190 + 80 mitad
-
+	'''
 	def limpiarListas(self):
 		del self.filasLista[:]	        # borrar lista 
 		del self.columnasLista[:]	# borrar lista
 		del self.filasListaNombres[:]	# borrar lista
 		del self.columnasListaNombres[:]# borrar lista
-
+	'''
 ############################### FIN DE LA CLASE TABLA #####################################
 
 '''
@@ -322,10 +333,103 @@ class Calendario:
 		return mesSiguiente
 
 ############################ INICIO DE LA CLASE CONTROL #####################################
-class ControlDeGuardia(Tabla): # 
+class ControlDeGuardia(Tabla): # Hereda de la clase Tabla
 
-	def __init__(self, pPapel, pTitulo, rAncho, rLargo, tFilas, tColumnas ): # 	  constructor clase PruebaRectangulo
+	def __init__(self, pPapel, pTitulo, rAncho, rLargo, tFilas, tColumnas, cPersonal): # 	  constructor clase PruebaRectangulo
 		Tabla.__init__(self, pPapel, pTitulo, rAncho, rLargo, tFilas, tColumnas ) #  constructor clase Papel
+	
+		self.personal= cPersonal # lista del personal
+
+
+	#def redefinirTamanioTexto
+
+	def hubicarHorizontalLetras(self, posicionX1, posicionX2, tamanioDelTexto):
+
+		
+		anchoDeLaGrilla= posicionX1 - posicionX2
+
+		if(anchoDeLaGrilla < 0):
+			anchoDeLaGrilla*= -1
+
+		posMenor= posicionX2
+		if(posicionX1 < posMenor):
+			posMenor= posicionX1
+
+		return (posMenor + (anchoDeLaGrilla - tamanioDelTexto)/2)
+
+	
+	def hubicarVerticalLetras(self, posicionY1, posicionY2, tamanioDelTexto):
+
+		altoDeLaGrilla= posicionY1 - posicionY2
+
+		if(altoDeLaGrilla < 0):
+			altoDeLaGrilla *= -1
+
+		posMayor= posicionY1
+		if(posicionY2 > posMayor):
+			posMayor= posicionY2
+
+		return (posMayor - (altoDeLaGrilla + (tamanioDelTexto-(tamanioDelTexto/3)))/2) #la longitud de la fuente menos un tercio de su longitud ejemp: 12-12/3= 12-4= 8
+
+		
+		'''
+
+		if(posicionX > posicionY):
+
+			posMayor= posicionX 
+			posMenor= posicionY
+		else:
+			posMayor= posicionY
+			posMeNor= posicionX 
+
+
+		anchoDeLaGrilla= posMayor - posMenor
+		'''
+
+	def escribirElPersonalEnLaTabla(self):
+
+		cont= 0
+		tamanioFuente= 12
+
+		for i in range(0, self.tamanioFilas):
+
+			if(i+1 != self.tamanioFilas):
+				
+				tamanioDelTexto= self.pdf.stringWidth(personal[cont].upper(), "Helvetica-Bold", tamanioFuente)
+
+				print(tamanioDelTexto)
+				'''
+				DEBUGGEAR
+				print("TEXTO")
+				print(tamanioDelTexto)
+				print("FILAS")
+				print(self.filasListaNombres[0])
+				print(self.filasListaNombres[1])
+				print("COLUMNAS")
+				print(self.columnasListaNombres[i])
+				print(self.columnasListaNombres[i+1])
+				DEBUGGEAR
+				'''
+				xlista= self.hubicarHorizontalLetras(self.filasListaNombres[0], self.filasListaNombres[1], tamanioDelTexto)
+				ylista= self.hubicarVerticalLetras(self.columnasListaNombres[i], self.columnasListaNombres[i+1], tamanioFuente)
+				texto= self.pdf.beginText(xlista , ylista)
+				texto.setFont("Helvetica-Bold", tamanioFuente)
+				texto.textLine(str(personal[cont].upper()))
+				self.pdf.drawText(texto)
+			else:
+				break
+
+			#c.drawString( , yLista2[i]-16 , str(personal[cont]))#borrar
+
+			if( cont == len(personal)-1):
+				cont=0
+			else:
+				cont+=1
+
+	#def escribirElCalendarioEnLaTabla(self):
+
+	#def esCribirElCalendario(self):
+
 
 	# atributos:
 
@@ -351,6 +455,36 @@ class ControlDeGuardia(Tabla): #
 
 if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 
+	
+	personal= ['Miguel', 'Eduardo', 'Brian', 'Jean', 'Cesar']# variables de clase (atributos)
+	meses=1 #lista de un mes simulada
+	anio= 2020
+
+
+	esteCalendario= Calendario(anio, meses)
+
+	numeroFilas= len(esteCalendario.obtenerCalendarioMesActual()) + 1 # el numero de filas puede variar dependiendo de las semanas + 1 fila del nombre del mes
+	numeroColumas= 8 # numero columa constante 8 = 7 columnas de dias + 1 columna del personal
+
+	esteControlDeGuardia= ControlDeGuardia(330,"CONTROL_DE_GUARDIA_"+str(anio)+".pdf", 550, 380, numeroFilas, numeroColumas, personal)  # sacar numero Filas y numero Columnas y colocarlo en funcion ?
+
+	esteControlDeGuardia.iniciarPDF()
+	esteControlDeGuardia.dibujarCintillo()
+	esteControlDeGuardia.escribirTitulo()
+	esteControlDeGuardia.dibujarUnaTabla()
+	esteControlDeGuardia.escribirElPersonalEnLaTabla()
+	esteControlDeGuardia.escribirPieDePagina("Av. Andres Bello, Torre BFC, Piso 13,  "+ 
+				  	      "Sector Guaicaipuro, Caracas - Venezuela",480)
+	esteControlDeGuardia.escribirPieDePagina("Tlfs +58-212 5785674–Fax +58 212 5724932",495)
+	esteControlDeGuardia.guardarPDF()
+	esteControlDeGuardia.finalizarPDF()
+		
+		
+	
+
+#aca debo definir le bucle para el rango de meses y todas esas cosas
+	
+	'''
 
 	esteCalendario= Calendario(2020, 1) # rango de meses ¿ lista ?
 
@@ -362,10 +496,12 @@ if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 	print(esteCalendario.obtenerCalendarioMesActual())
 	print(esteCalendario.obternerNombreMesSiguiente())
 	print(esteCalendario.obtenerCalendarioMesSiguiente())
+	
+	'''
 
 
 #################################################################################################################
-
+	'''
 	estaTabla= Tabla(330,"CONTROL_DE_GUARDIA_2020.pdf", 550, 380, 7, 8)
 
 
@@ -375,7 +511,7 @@ if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 
 	
 	#estaTabla.decidirCantidadRectangulos(2)
-	estaTabla.dibujarDosTabla()
+	estaTabla.dibujarUnaTabla()
 
 
 	estaTabla.escribirPieDePagina("Av. Andres Bello, Torre BFC, Piso 13,  "+ 
@@ -383,7 +519,7 @@ if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 	estaTabla.escribirPieDePagina("Tlfs +58-212 5785674–Fax +58 212 5724932",495)
 	estaTabla.guardarPDF()
 	estaTabla.finalizarPDF()
-	
+	'''
 #################################################################################################################
 	'''
 	esteRectangulo= PruebaRectangulo(330,"CONTROL_DE_GUARDIA_2020.pdf", 550, 380)
