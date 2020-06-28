@@ -19,12 +19,18 @@
 
 # NOTA: rango de meses, ¿ lista ? del 1..
 # NOTA: algoritmo de rango de meses debe definir si es par o impar y activar un swiche ?
-
+# NOTA: ES IMPORTANTE LA FUNCION DE REDEFINIR TAMAÑO POR LA PROPIEDAD POLIMORFICA DE LA TABLA (RESUELTO)
+# NOTA: COLORES CLAROS-TRANSPARENTES EN PALABRAS DE MESES ANTERIORES O SIGUIENTES ESCRITAS EN LA TABLA (RESUELTO)
+# NOTA: problema identificado para el ciclo del calendario cuando el ultimo personal de turno, ultima semana
+# y el mes no culmina, debe persistir y no hay algoritmo para persistirlo, importante para los ciclos OJOOOOO
+ 
 
 import calendar
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
+from reportlab.lib.colors import HexColor
 from reportlab.pdfbase.pdfmetrics import stringWidth
+
 
 ############################ INICIO DE LA CLASE PAPEL #####################################
 
@@ -69,10 +75,20 @@ class Papel(object): # CLASE ABSTRACTA
 
 		
 		pie= self.pdf.beginText((self.ancho-tamanioTexto)/2, self.altura - alto)
+		pie.setFillColor(HexColor(0x000000))
 		pie.setFont("Helvetica", 10)
 		pie.textLine(texto)
 
 		self.pdf.drawText(pie)
+
+	def selloDelPrograma(self):
+
+		sello= self.pdf.beginText(22.635, self.altura - 495)
+		sello.setFillColor(HexColor(0xcccccc))
+		sello.setFont("Helvetica-Bold", 12)
+		sello.textLine("cronoguardvencert.py")
+
+		self.pdf.drawText(sello)
 
 	def guardarPDF(self):
 		self.pdf.showPage()
@@ -190,7 +206,7 @@ class Tabla(Papel):# Hereda de la clase Papel
 			filasLista.append(sumaHorizontales) # llenar lista del calendario
 			#sumaHorizontales+= resto #comentar esta linea para redefinir la posicion
 			contColumnas-= 1
-		filasLista.append(sumaHorizontales)
+		#filasLista.append(sumaHorizontales)
 
 # FIN CICLOS QUE OBLIGAN EL CRECIMIENTO DINAMICO DE LAS GRILLAS CONSERVANDO EL TAMAÑO DE LA TABLA		
 #--------------------------------------------------------------------------------------------
@@ -287,7 +303,7 @@ class Calendario:
 		else:
 			print("ERROR!!! MES FUERA DE RANGO!")
 
-	def obtenerDias():
+	def obtenerDias(self):
 		return self.dias
 
 	def obtenerNombreMesAnterior(self):
@@ -341,7 +357,25 @@ class ControlDeGuardia(Tabla): # Hereda de la clase Tabla
 		self.personal= cPersonal # lista del personal
 
 
-	#def redefinirTamanioTexto
+	def redefinirTamanioHorizontalTexto(self, posicionX1, posicionX2, tamanioDelTexto):
+
+		valor= False
+
+		anchoDeLaGrilla= posicionX1 - posicionX2 #ancho de la grilla
+
+		if(anchoDeLaGrilla < 0):
+			anchoDeLaGrilla*= -1
+
+		#print("ANCHO DE LA GRILLA: "+str(anchoDeLaGrilla))
+		#print("TAMANIO DE TEXTO: "+str(tamanioDelTexto))
+
+		if(anchoDeLaGrilla <= tamanioDelTexto + 6 ): # 6 es el espacio entre el texto y la grilla
+			valor= True
+
+		return valor
+			#tamanio del texto disminuye
+
+		 #NOTA: ES IMPORTANTE LA FUNCION DE REDEFINIR TAMAÑO POR LA PROPIEDAD POLIMORFICA DE LA TABLA
 
 	def hubicarHorizontalLetras(self, posicionX1, posicionX2, tamanioDelTexto):
 
@@ -389,17 +423,22 @@ class ControlDeGuardia(Tabla): # Hereda de la clase Tabla
 	def escribirElPersonalEnLaTabla(self):
 
 		cont= 0
-		tamanioFuente= 12
 
 		for i in range(0, self.tamanioFilas):
 
 			if(i+1 != self.tamanioFilas):
-				
-				tamanioDelTexto= self.pdf.stringWidth(personal[cont].upper(), "Helvetica-Bold", tamanioFuente)
 
-				print(tamanioDelTexto)
+				tamanioFuente= 12
+				tamanioDelTexto= self.pdf.stringWidth(personal[cont].upper(), "Helvetica-Bold", tamanioFuente)
+				# BUCLE REDEFINE EL TAMAÑO DEL TEXTO HORIZONTALMENTE
+				while( self.redefinirTamanioHorizontalTexto( self.filasListaNombres[0], self.filasListaNombres[1], tamanioDelTexto ) ):
+					tamanioFuente-= 1
+					tamanioDelTexto= self.pdf.stringWidth(personal[cont].upper(), "Helvetica-Bold", tamanioFuente)
+				# BUCLE REDEFINE EL TAMAÑO DEL TEXTO HORIZONTALMENTE
+				#print("TAMANIO DE LA FUENTE: "+str(tamanioFuente)) BORRAR
+				#print(tamanioDelTexto) BORRAR 
 				'''
-				DEBUGGEAR
+				DEBUGGEAR BORRAR
 				print("TEXTO")
 				print(tamanioDelTexto)
 				print("FILAS")
@@ -408,11 +447,12 @@ class ControlDeGuardia(Tabla): # Hereda de la clase Tabla
 				print("COLUMNAS")
 				print(self.columnasListaNombres[i])
 				print(self.columnasListaNombres[i+1])
-				DEBUGGEAR
+				DEBUGGEAR BORRAR
 				'''
 				xlista= self.hubicarHorizontalLetras(self.filasListaNombres[0], self.filasListaNombres[1], tamanioDelTexto)
 				ylista= self.hubicarVerticalLetras(self.columnasListaNombres[i], self.columnasListaNombres[i+1], tamanioFuente)
 				texto= self.pdf.beginText(xlista , ylista)
+				texto.setFillColor(HexColor(0xcc0000))
 				texto.setFont("Helvetica-Bold", tamanioFuente)
 				texto.textLine(str(personal[cont].upper()))
 				self.pdf.drawText(texto)
@@ -426,11 +466,133 @@ class ControlDeGuardia(Tabla): # Hereda de la clase Tabla
 			else:
 				cont+=1
 
-	#def escribirElCalendarioEnLaTabla(self):
+	def escribirNombreMesEnLaTabla(self, nombreMesActual): 
 
-	#def esCribirElCalendario(self):
+		resta= self.columnasListaNombres[2] - self.columnasListaNombres[3]
+
+		if(resta < 0 ):
+			resta *= -1
+
+		suma= self.columnasListaNombres[0] + resta 
+
+		tamanioFuente= 50
+		tamanioDelTexto= self.pdf.stringWidth(nombreMesActual, "Helvetica-Bold", tamanioFuente)
+		
+		while( self.redefinirTamanioHorizontalTexto( self.filasListaNombres[0], self.filasListaNombres[1], tamanioDelTexto ) ):
+					tamanioFuente-= 1
+					tamanioDelTexto= self.pdf.stringWidth(nombreMesActual.upper(), "Helvetica-Bold", tamanioFuente)
+		
+
+		xlista= self.hubicarHorizontalLetras(self.filasListaNombres[0], self.filasListaNombres[1], tamanioDelTexto)
+		ylista= self.hubicarVerticalLetras(suma, self.columnasListaNombres[0], tamanioFuente)
+		texto= self.pdf.beginText(xlista , ylista)
+		texto.setFillColor(HexColor(0x9faec8))
+		texto.setFont("Helvetica-Bold", tamanioFuente)
+		texto.textLine(str(nombreMesActual.upper()))
+		self.pdf.drawText(texto)
+
+	def escribirDiasEnlaTabla(self, dias):
+
+		cont= 0
+		for i in range(0, len(dias)):
+
+			#if(j+1 < len(dias)):
+
+			tamanioFuente= 12
+			tamanioDelTexto= self.pdf.stringWidth(dias[cont], "Helvetica-Bold", tamanioFuente)
+			while( self.redefinirTamanioHorizontalTexto( self.filasLista[i], self.filasLista[i+1], tamanioDelTexto ) ):
+				tamanioFuente-= 1
+				tamanioDelTexto= self.pdf.stringWidth(dias[cont], "Helvetica-Bold", tamanioFuente)
+
+			xlista= self.hubicarHorizontalLetras(self.filasLista[i], self.filasLista[i+1], tamanioDelTexto)#columas
+			ylista= self.hubicarVerticalLetras(self.columnasLista[0], self.columnasLista[1], tamanioFuente) #filas
+			texto= self.pdf.beginText(xlista , ylista)
+			texto.setFillColor(HexColor(0x000000))
+			texto.setFont("Helvetica-Bold", tamanioFuente)
+			texto.textLine(str(dias[cont]))
+			self.pdf.drawText(texto)
+			#else:
+				#break
+
+			cont+=1
+		
+		self.columnasLista.pop(0)# se elimina la primera fila
+
+	def escribirElCalendarioEnLaTabla(self, mesActual, nombreMesAnterior, nombreMesSiguiente):
+
+		#cont= 0
+		cont1=0
+		for i in range(0, len(dias)):
+			cont2=0
+			for j in range(0, len(self.columnasLista)-1):
+
+			#if(j+1 < len(dias)):
+
+				#cadena="x"
+				if(mesActual[cont2][cont1] != 0):# condicion impide escritura de ceros
+					cadena= mesActual[cont2][cont1]
+					fuente= "Helvetica"
+					tamanio= 16
+					hexaColor= 0x272727
+
+				if(j == 0):#  sustituye los ceros de las primeras filas del mes , por el nombre del mes anterior
+					if(mesActual[cont2][cont1] == 0):
+						cadena= nombreMesAnterior
+						fuente= "Helvetica-Bold"
+						tamanio= 12
+						hexaColor= 0x9faec8
+
+				if(j == len(self.columnasLista)-2):#  sustituye los ceros de las ultimas filas del mes , por el nombre del siguiente mes
+					if(mesActual[cont2][cont1] == 0):
+						cadena= nombreMesSiguiente
+						fuente= "Helvetica-Bold"
+						tamanio= 12
+						hexaColor= 0x9faec8
+
+				tamanioFuente= tamanio
+				tamanioDelTexto= self.pdf.stringWidth(str(cadena), fuente, tamanioFuente)
+				
+				while( self.redefinirTamanioHorizontalTexto( self.filasLista[i], self.filasLista[i+1], tamanioDelTexto ) ):
+					tamanioFuente-= 1
+					tamanioDelTexto= self.pdf.stringWidth(str(cadena), fuente, tamanioFuente)
+				
+
+				xlista= self.hubicarHorizontalLetras(self.filasLista[i], self.filasLista[i+1], tamanioDelTexto)#columas
+				ylista= self.hubicarVerticalLetras(self.columnasLista[j], self.columnasLista[j+1], tamanioFuente) #filas
+				texto= self.pdf.beginText(xlista , ylista)
+				texto.setFillColor(HexColor(hexaColor))
+				texto.setFont(fuente, tamanioFuente)
+				texto.textLine(str(cadena))
+				self.pdf.drawText(texto)
 
 
+					
+			#else:
+				#break
+
+				#print("cont2="+str(cont2))
+				#print(mesActual[cont2][cont1])
+				cont2+=1
+				#cont+=1
+
+			#print("cont1="+str(cont1))
+			cont1+=1
+			
+
+		'''
+		print("FILA LISTA TAMANIO: "+str(len(self.filasLista)))
+
+		#print(self.filasLista)
+		print("COLUMNA LISTA TAMANIO: "+str(len(self.columnasLista)))
+
+		#print(self.columnasLista)
+		print("DIAS LISTA TAMANIO: "+str(len(dias)))
+		#print(self.columnasListaNombres)
+		print("MESACTUAL LISTA TAMANIO FILAS: "+str(len(mesActual)))
+		print("MESACTUAL LISTA TAMANIO COLUMNAS: "+str(len(mesActual[0])))
+		print("TAMANIO TOTAL MESACTUAL: "+str(len(mesActual) * len(mesActual[0])))
+		#print(mesActual)
+		'''
 	# atributos:
 
 	# operaciones:
@@ -456,12 +618,20 @@ class ControlDeGuardia(Tabla): # Hereda de la clase Tabla
 if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 
 	
-	personal= ['Miguel', 'Eduardo', 'Brian', 'Jean', 'Cesar']# variables de clase (atributos)
-	meses=1 #lista de un mes simulada
+	personal= ['Cesar', 'Miguel','Eduardo', 'Brian', 'Jean', 'Cesar']# variables de clase (atributos)
+	meses=7 #lista de un mes simulada
 	anio= 2020
 
 
 	esteCalendario= Calendario(anio, meses)
+	mesActual= esteCalendario.obtenerCalendarioMesActual()
+	nombreMesAnterior= esteCalendario.obtenerNombreMesAnterior()
+	nombreMesActual= esteCalendario.obtenerNombreMesActual()
+	nombreMesSiguiente= esteCalendario.obternerNombreMesSiguiente()
+
+	print("ESTE ES EL MES SIGUIENTE: "+ str(nombreMesSiguiente))
+
+	dias= esteCalendario.obtenerDias()
 
 	numeroFilas= len(esteCalendario.obtenerCalendarioMesActual()) + 1 # el numero de filas puede variar dependiendo de las semanas + 1 fila del nombre del mes
 	numeroColumas= 8 # numero columa constante 8 = 7 columnas de dias + 1 columna del personal
@@ -472,20 +642,20 @@ if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 	esteControlDeGuardia.dibujarCintillo()
 	esteControlDeGuardia.escribirTitulo()
 	esteControlDeGuardia.dibujarUnaTabla()
+	esteControlDeGuardia.escribirNombreMesEnLaTabla(nombreMesActual)
 	esteControlDeGuardia.escribirElPersonalEnLaTabla()
+	esteControlDeGuardia.escribirDiasEnlaTabla(dias)
+	esteControlDeGuardia.escribirElCalendarioEnLaTabla(mesActual, nombreMesAnterior, nombreMesSiguiente)
 	esteControlDeGuardia.escribirPieDePagina("Av. Andres Bello, Torre BFC, Piso 13,  "+ 
 				  	      "Sector Guaicaipuro, Caracas - Venezuela",480)
 	esteControlDeGuardia.escribirPieDePagina("Tlfs +58-212 5785674–Fax +58 212 5724932",495)
+	esteControlDeGuardia.selloDelPrograma()
 	esteControlDeGuardia.guardarPDF()
 	esteControlDeGuardia.finalizarPDF()
 		
-		
-	
-
 #aca debo definir le bucle para el rango de meses y todas esas cosas
 	
 	'''
-
 	esteCalendario= Calendario(2020, 1) # rango de meses ¿ lista ?
 
 	
@@ -498,8 +668,6 @@ if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 	print(esteCalendario.obtenerCalendarioMesSiguiente())
 	
 	'''
-
-
 #################################################################################################################
 	'''
 	estaTabla= Tabla(330,"CONTROL_DE_GUARDIA_2020.pdf", 550, 380, 7, 8)
