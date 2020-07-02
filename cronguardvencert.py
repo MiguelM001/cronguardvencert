@@ -16,7 +16,9 @@
 # 	Automatizacion de  la  elaboracion  del  documento   en
 #  PDF  del  control  de guardia  para  el personal  de vencert
 #  durante el periodo y el personal especificado por el usuario
-
+import os
+import sys
+import time
 import calendar
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -36,8 +38,6 @@ class Papel(object): # CLASE ABSTRACTA
 		self.pdf= None
 
 	def iniciarPDF(self):
-		print("tamaño del papel: " + str(self.tamanioPapel))
-		print(self.titulo)
 		self.pdf = canvas.Canvas(self.titulo, pagesize=self.tamanioPapel)
 		self.pdf.setTitle(self.titulo)
 
@@ -428,8 +428,7 @@ class ControlDeGuardia(Tabla): # Hereda de la clase Tabla
 								self.contPersonal -= 1
 						
 				
-				print("ULTIMO ELEMENTO DEL MES ACTUAL")
-				print(mesActual[len(mesActual)-1][len(mesActual[len(mesActual)-1])-1])
+				
 				tamanioFuente= tamanio
 				tamanioDelTexto= self.pdf.stringWidth(str(cadena), fuente, tamanioFuente)
 				
@@ -452,20 +451,142 @@ class ControlDeGuardia(Tabla): # Hereda de la clase Tabla
 			
 ############################ FIN DE LA CLASE CONTROL ########################################
 #################### INICIO DE LA CLASE INTERFAZ DE USUARIO #################################
+
+class InterfazDeUsuario:
+
+
+	def __init__(self, argv):
+
+		self.argv= argv
+
+		self.nombres= list()
+		self.numero= list()
+		self.unAnio= 0
+
+
+	def clasificarValores(self):
+
+		nombres= self.nombres
+		numero= self.numero
+		unAnio= self.unAnio
+
+		for i in range(0,len(sys.argv)):
+
+	
+			if(sys.argv[i] == "-p" or sys.argv[i] == "--personal"):
+
+				palabra=''
+				for letra in sys.argv[i+1]:
+			
+			
+					if(letra != ','):
+
+						palabra+=letra
+					else:
+						nombres.append(palabra)
+						palabra=''
+		
+				nombres.append(palabra)
+		
+			digito=''
+
+			if(sys.argv[i] == "-m" or sys.argv[i] == "--meses"):
+
+				if sys.argv[i+1] != 1:
+	
+					for num in sys.argv[i+1]:
+
+						if(num != '-'):
+
+							digito+= num
+						else: 
+							numero.append(int(digito))
+							digito=''
+
+					numero.append(int(digito))
+
+				else:
+					numero.append(int(num))
+
+	
+			if(sys.argv[i] == "-a" or sys.argv[i] == "--anio"):
+				unAnio= int(sys.argv[i+1])
+	
+
+			if sys.argv[i] == "-h" or sys.argv[i] == "--ayuda":
+				self.desplegarAyuda()
+
+		#print(nombres)
+		#print(numero)
+		#print(unAnio)
+
+		self.nombres= nombres
+		self.numero= numero
+		self.unAnio= unAnio
+
+	def obtenerLosNombres(self):
+		return self.nombres
+
+	
+	def ObtenerRangoDeMeses(self):
+
+		lista= self.numero
+		
+		if(len(self.numero) > 1):
+
+			for i in range(self.numero[0], self.numero[1]):
+				lista.append(i)
+			lista.append(i+1)
+
+		return lista
+
+	def obtnerElAnio(self):
+		return self.unAnio
+
+				
+	def desplegarAyuda(self):
+		print()
+		print("Cronograma de Guardia Automatizado de VenCERT V1.0:")
+		print()
+		print("\tEjemplo de uso: python3 cronguardvencert.py -p miguel,cesar,eduardo,brian,jean -m 7-12 -a 2020")
+		print("\t\t\tpython3 cronguardvencert.py --personal miguel,cesar,eduardo,brian,jean --meses 7-12 --anio 2020")
+		print()
+		print("Comandos:")
+		print()
+		print("-p --personal\tintruduzca el orden del personal en la tabla, separado solo por coma (,) ")
+		print("-m --meses\tIntruduzca el rango de los meses jemplo: 1-12, 1, separado por el signo (-)")
+		print("-a --anio\tintroduzca el anio actual, en un entero de cuatro digitos")
+		print("-h --ayuda\tComando para dezplegar la ayuda")
+		print()
+
+
+
 	# EN CONSTRUCCION
 ###################### FIN DE LA CLASE INTERFAZ DE USUARIO ##################################
 # INICIO DE MAIN
 if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 
+	sys.argv.pop(0)
+
+	estaInterfazDeUsuario= InterfazDeUsuario(sys.argv)
+	estaInterfazDeUsuario.clasificarValores()
+	if(not sys.argv):
+		estaInterfazDeUsuario.desplegarAyuda()
+
+	personal= estaInterfazDeUsuario.obtenerLosNombres()
+	meses= estaInterfazDeUsuario.ObtenerRangoDeMeses()
+	anio= estaInterfazDeUsuario.obtnerElAnio()
+
 	#INPUTS
 	#personal= ['Cesar','Miguel','Eduardo', 'Brian', 'Jean']# variables de clase (atributos)
-	personal= ['Cesar','Miguel','Eduardo', 'Brian', 'Jean']# variables de clase (atributos)
-	meses= [7,8,9,10,11,12]
-	anio= 2020
+	#personal= ['Cesar','Miguel','Eduardo', 'Brian', 'Jean']# variables de clase (atributos)
+	#meses= [7,8,9,10,11,12]
+	#anio= 2020
 	#INPUTS
 	
 	#INSTANCIACION DE LA CLASE ControlDeGuardia
-	esteControlDeGuardia= ControlDeGuardia(330,"CONTROL_DE_GUARDIA_"+str(anio)+".pdf", 550, 380, personal)  # sacar numero Filas y numero Columnas y colocarlo en funcion ?
+	titulo= "CONTROL_DE_GUARDIA_"+str(anio)+".pdf"
+	esteControlDeGuardia= ControlDeGuardia(330,titulo, 550, 380, personal)  # sacar numero Filas y numero Columnas y colocarlo en funcion ?
 	esteControlDeGuardia.iniciarPDF()
 	#INSTANCIACION DE LA CLASE ControlDeGuardia
 
@@ -534,7 +655,7 @@ if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 			esteControlDeGuardia.escribirElCalendarioEnLaTabla(mesActual, mesAnterior, mesSiguiente)
 			#INSTANCIACION DE LA CLASE ControlDeGuardia
 			indexMeses+=1
-			contTablas-= 1
+			#contTablas-= 1
 	
 		# PIE DE PAGINA
 		esteControlDeGuardia.escribirPieDePagina("Av. Andres Bello, Torre BFC, Piso 13,  "+ 
@@ -544,6 +665,16 @@ if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 		esteControlDeGuardia.guardarPDF()
 
 		contPaginas-= 2
-	# GENERACION DEL DOCUMENTO PDF
+	
 	esteControlDeGuardia.finalizarPDF()
+
+	archivo= os.getcwd()+'/'+titulo
+	if(esteControlDeGuardia):
+		if(os.path.isfile(archivo)):
+			print()
+			print("DOCUMENTO GENERADO...")
+			print()
+			print("Ruta:")
+			print("\t\t"+os.getcwd()+'/'+titulo)
+		print()
 #FIN DE MAIN
