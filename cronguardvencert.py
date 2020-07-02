@@ -554,7 +554,7 @@ class InterfazDeUsuario:
 		print("Comandos:")
 		print()
 		print("-p --personal\tintruduzca el orden del personal en la tabla, separado solo por coma (,) ")
-		print("-m --meses\tIntruduzca el rango de los meses jemplo: 1-12, 1, separado por el signo (-)")
+		print("-m --meses\tIntruduzca el rango de los meses jemplo: 1-12,  separado por el signo (-)")
 		print("-a --anio\tintroduzca el anio actual, en un entero de cuatro digitos")
 		print("-h --ayuda\tComando para dezplegar la ayuda")
 		print()
@@ -583,36 +583,61 @@ if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 	#meses= [7,8,9,10,11,12]
 	#anio= 2020
 	#INPUTS
+
+	if(personal != None and meses != None and anio != 0):
 	
-	#INSTANCIACION DE LA CLASE ControlDeGuardia
-	titulo= "CONTROL_DE_GUARDIA_"+str(anio)+".pdf"
-	esteControlDeGuardia= ControlDeGuardia(330,titulo, 550, 380, personal)  # sacar numero Filas y numero Columnas y colocarlo en funcion ?
-	esteControlDeGuardia.iniciarPDF()
-	#INSTANCIACION DE LA CLASE ControlDeGuardia
-
-	contPaginas= len(meses) # contador de paginas
-	indexMeses= 0 # indice para la lista meses[]
-
-	while(contPaginas >= 1):
 		#INSTANCIACION DE LA CLASE ControlDeGuardia
-		esteControlDeGuardia.dibujarCintillo()
-		esteControlDeGuardia.escribirTitulo()
+		titulo= "CONTROL_DE_GUARDIA_"+str(anio)+".pdf"
+		esteControlDeGuardia= ControlDeGuardia(330,titulo, 550, 380, personal)  # sacar numero Filas y numero Columnas y colocarlo en funcion ?
+		esteControlDeGuardia.iniciarPDF()
 		#INSTANCIACION DE LA CLASE ControlDeGuardia
-		contTablas= 2
 
-		if(contPaginas != 1):
-			switche= True
+		contPaginas= len(meses) # contador de paginas
+		indexMeses= 0 # indice para la lista meses[]
 
-			while(contTablas >= 1):
+		while(contPaginas >= 1):
+			#INSTANCIACION DE LA CLASE ControlDeGuardia
+			esteControlDeGuardia.dibujarCintillo()
+			esteControlDeGuardia.escribirTitulo()
+			#INSTANCIACION DE LA CLASE ControlDeGuardia
+			contTablas= 2
 
-				if(switche == True):
-					posicion= (80 - 3.5 )
-					switche= False
-				else: 
-					posicion= (270 + 5.5)
-					switche= True
+			if(contPaginas != 1):
+				switche= True
 
-				#INSTANCIACION DE LA CLASE CALENDARIO
+				while(contTablas >= 1):
+
+					if(switche == True):
+						posicion= (80 - 3.5 )
+						switche= False
+					else: 
+						posicion= (270 + 5.5)
+						switche= True
+
+					#INSTANCIACION DE LA CLASE CALENDARIO
+					esteCalendario= Calendario(anio, meses[indexMeses])
+					mesAnterior= esteCalendario.obtenerCalendarioMesAnterior()
+					mesActual= esteCalendario.obtenerCalendarioMesActual()
+					mesSiguiente= esteCalendario.obtenerCalendarioMesSiguiente()
+					nombreMesActual= esteCalendario.obtenerNombreMesActual()
+					dias= esteCalendario.obtenerDias()
+					numeroFilas= len(esteCalendario.obtenerCalendarioMesActual()) + 1 # el numero de filas puede variar dependiendo de las semanas + 1 fila del nombre del mes
+					numeroColumas= 8 # numero columa constante 8 = 7 columnas de dias + 1 columna del personal
+					#INSTANCIACION DE LA CLASE CALENDARIO
+					#INSTANCIACION DE LA CLASE ControlDeGuardia
+					esteControlDeGuardia.enviarNumeroDeFilas(numeroFilas)
+					esteControlDeGuardia.enviarNumeroDeColumnas(numeroColumas)
+					esteControlDeGuardia.dibujarTabla(posicion)
+					esteControlDeGuardia.escribirNombreMesEnLaTabla(nombreMesActual)
+					esteControlDeGuardia.escribirElPersonalEnLaTabla()
+					esteControlDeGuardia.escribirDiasEnlaTabla(dias)
+					esteControlDeGuardia.escribirElCalendarioEnLaTabla(mesActual, mesAnterior, mesSiguiente)
+					#INSTANCIACION DE LA CLASE ControlDeGuardia
+					indexMeses+=1
+					contTablas-= 1
+			else:
+			
+				#INSTANCIACION DE LA CLASE Calendario
 				esteCalendario= Calendario(anio, meses[indexMeses])
 				mesAnterior= esteCalendario.obtenerCalendarioMesAnterior()
 				mesActual= esteCalendario.obtenerCalendarioMesActual()
@@ -621,60 +646,37 @@ if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 				dias= esteCalendario.obtenerDias()
 				numeroFilas= len(esteCalendario.obtenerCalendarioMesActual()) + 1 # el numero de filas puede variar dependiendo de las semanas + 1 fila del nombre del mes
 				numeroColumas= 8 # numero columa constante 8 = 7 columnas de dias + 1 columna del personal
-				#INSTANCIACION DE LA CLASE CALENDARIO
+				#INSTANCIACION DE LA CLASE Calendario
 				#INSTANCIACION DE LA CLASE ControlDeGuardia
 				esteControlDeGuardia.enviarNumeroDeFilas(numeroFilas)
 				esteControlDeGuardia.enviarNumeroDeColumnas(numeroColumas)
-				esteControlDeGuardia.dibujarTabla(posicion)
+				esteControlDeGuardia.dibujarUnaTabla()
 				esteControlDeGuardia.escribirNombreMesEnLaTabla(nombreMesActual)
 				esteControlDeGuardia.escribirElPersonalEnLaTabla()
 				esteControlDeGuardia.escribirDiasEnlaTabla(dias)
 				esteControlDeGuardia.escribirElCalendarioEnLaTabla(mesActual, mesAnterior, mesSiguiente)
 				#INSTANCIACION DE LA CLASE ControlDeGuardia
 				indexMeses+=1
-				contTablas-= 1
-		else:
-			
-			#INSTANCIACION DE LA CLASE Calendario
-			esteCalendario= Calendario(anio, meses[indexMeses])
-			mesAnterior= esteCalendario.obtenerCalendarioMesAnterior()
-			mesActual= esteCalendario.obtenerCalendarioMesActual()
-			mesSiguiente= esteCalendario.obtenerCalendarioMesSiguiente()
-			nombreMesActual= esteCalendario.obtenerNombreMesActual()
-			dias= esteCalendario.obtenerDias()
-			numeroFilas= len(esteCalendario.obtenerCalendarioMesActual()) + 1 # el numero de filas puede variar dependiendo de las semanas + 1 fila del nombre del mes
-			numeroColumas= 8 # numero columa constante 8 = 7 columnas de dias + 1 columna del personal
-			#INSTANCIACION DE LA CLASE Calendario
-			#INSTANCIACION DE LA CLASE ControlDeGuardia
-			esteControlDeGuardia.enviarNumeroDeFilas(numeroFilas)
-			esteControlDeGuardia.enviarNumeroDeColumnas(numeroColumas)
-			esteControlDeGuardia.dibujarUnaTabla()
-			esteControlDeGuardia.escribirNombreMesEnLaTabla(nombreMesActual)
-			esteControlDeGuardia.escribirElPersonalEnLaTabla()
-			esteControlDeGuardia.escribirDiasEnlaTabla(dias)
-			esteControlDeGuardia.escribirElCalendarioEnLaTabla(mesActual, mesAnterior, mesSiguiente)
-			#INSTANCIACION DE LA CLASE ControlDeGuardia
-			indexMeses+=1
-			#contTablas-= 1
+				#contTablas-= 1
 	
-		# PIE DE PAGINA
-		esteControlDeGuardia.escribirPieDePagina("Av. Andres Bello, Torre BFC, Piso 13,  "+ 
-				  	      "Sector Guaicaipuro, Caracas - Venezuela",480)
-		esteControlDeGuardia.escribirPieDePagina("Tlfs +58-212 5785674–Fax +58 212 5724932",495)
-		esteControlDeGuardia.selloDelPrograma()
-		esteControlDeGuardia.guardarPDF()
+			# PIE DE PAGINA
+			esteControlDeGuardia.escribirPieDePagina("Av. Andres Bello, Torre BFC, Piso 13,  "+ 
+				  		      "Sector Guaicaipuro, Caracas - Venezuela",480)
+			esteControlDeGuardia.escribirPieDePagina("Tlfs +58-212 5785674–Fax +58 212 5724932",495)
+			esteControlDeGuardia.selloDelPrograma()
+			esteControlDeGuardia.guardarPDF()
 
-		contPaginas-= 2
+			contPaginas-= 2
 	
-	esteControlDeGuardia.finalizarPDF()
+		esteControlDeGuardia.finalizarPDF()
 
-	archivo= os.getcwd()+'/'+titulo
-	if(esteControlDeGuardia):
-		if(os.path.isfile(archivo)):
-			print()
-			print("DOCUMENTO GENERADO...")
-			print()
-			print("Ruta:")
-			print("\t\t"+os.getcwd()+'/'+titulo)
-		print()
+		archivo= os.getcwd()+'/'+titulo
+		if(esteControlDeGuardia):
+			if(os.path.isfile(archivo)):
+				print()
+				print("DOCUMENTO GENERADO...")
+				print()
+				print("Ruta:")
+				print("\t\t"+os.getcwd()+'/'+titulo)
+				print()
 #FIN DE MAIN
