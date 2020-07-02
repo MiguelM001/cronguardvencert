@@ -558,7 +558,7 @@ class InterfazDeUsuario:
 		print("Comandos:")
 		print()
 		print("-p --personal\tintruduzca el orden del personal en la tabla, separado solo por coma (,) ")
-		print("-m --meses\tIntruduzca el rango de los meses jemplo: 1-12,  separado por el signo (-)")
+		print("-m --meses\tIntruduzca el rango de los meses en secuencia ascendente jemplo: 1-12,  separado por el signo (-)")
 		print("-a --anio\tintroduzca el anio actual, en un entero de cuatro digitos")
 		print("-h --ayuda\tComando para dezplegar la ayuda")
 		print()
