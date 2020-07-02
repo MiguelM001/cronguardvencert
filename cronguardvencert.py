@@ -538,7 +538,11 @@ class InterfazDeUsuario:
 				lista.append(i)
 			lista.append(i+1)
 
-		return lista
+			return lista
+
+		else:
+			return self.numero
+	
 
 	def obtnerElAnio(self):
 		return self.unAnio
@@ -576,8 +580,6 @@ if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 	personal= estaInterfazDeUsuario.obtenerLosNombres()
 	meses= estaInterfazDeUsuario.ObtenerRangoDeMeses()
 	anio= estaInterfazDeUsuario.obtnerElAnio()
-
-	print(meses)
 
 	#INPUTS
 	#personal= ['Cesar','Miguel','Eduardo', 'Brian', 'Jean']# variables de clase (atributos)
