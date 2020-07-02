@@ -1,5 +1,4 @@
-<center><h1>Automatización del Cronograma de Guardia de VenCERT</h1></center>
-
+<h1>Automatización del Cronograma de Guardia de VenCERT</h1>
 <h3>Requisitos:</h3>
 
 	python 3
