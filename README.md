@@ -9,36 +9,37 @@
 
 instalamos pip3
 
-	<code>apt-get install python3-pip</code>
+	apt-get install python3-pip
 
 el entorno virtual virtualenv no es indispensable, pero permite aislar las librerias
 
-	<code>pip3 install virtualenv</code>
+	pip3 install virtualenv
 
 crear el entorno virutal con virtualenv
 
-	<code>virtualenv envcrono --python=python3</code>
+	virtualenv envcrono --python=python3
 
 entrar en la carpeta "envcrono"
 
-	<code>cd /ruta/envcrono</code>
+	cd /ruta/envcrono
 
 descargar el codigo fuente del programa
 
-	<code>git clone https://github.com/MiguelM001/cronguardvencert.git</code>
+	git clone https://github.com/MiguelM001/cronguardvencert.git
 
 dentro de la carpeta "envcrono" ejecutar:
 
-	<code>source bin/activate</code>
+	source bin/activate
 
 instalar la libreria reportlab
 
-	<code>pip3 install reportlab</code>
+	pip3 install reportlab
 
 entrar en la carpeta cronguardvencert y ejecutar cualquiera de los siguientes comandos:
 
-	<code>python3 cronguardvencert.py</code>
-	<code>python3 cronguardvencert.py -h</code>
-	<code>python3 cronguardvencert.py --help</code>
+	python3 cronguardvencert.py
+	python3 cronguardvencert.py -h
+	python3 cronguardvencert.py --help
 
 Se desplegará un menu de ayuda junto con un ejemplo de uso del programa.
+
