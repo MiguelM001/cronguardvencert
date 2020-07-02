@@ -530,7 +530,7 @@ class InterfazDeUsuario:
 	
 	def ObtenerRangoDeMeses(self):
 
-		lista= self.numero
+		lista= list()
 		
 		if(len(self.numero) > 1):
 
@@ -576,6 +576,8 @@ if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 	personal= estaInterfazDeUsuario.obtenerLosNombres()
 	meses= estaInterfazDeUsuario.ObtenerRangoDeMeses()
 	anio= estaInterfazDeUsuario.obtnerElAnio()
+
+	print(meses)
 
 	#INPUTS
 	#personal= ['Cesar','Miguel','Eduardo', 'Brian', 'Jean']# variables de clase (atributos)
