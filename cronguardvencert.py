@@ -326,24 +326,24 @@ class ControlDeGuardia(Tabla): # Hereda de la clase Tabla
 			if(i+1 != self.tamanioFilas):
 
 				tamanioFuente= 12
-				tamanioDelTexto= self.pdf.stringWidth(personal[self.contPersonal].upper(), "Helvetica-Bold", tamanioFuente)
+				tamanioDelTexto= self.pdf.stringWidth(self.personal[self.contPersonal].upper(), "Helvetica-Bold", tamanioFuente)
 				# BUCLE REDEFINE EL TAMAÑO DEL TEXTO HORIZONTALMENTE
 				while( self.redefinirTamanioHorizontalTexto( self.filasListaNombres[0], self.filasListaNombres[1], tamanioDelTexto ) ):
 					tamanioFuente-= 1
-					tamanioDelTexto= self.pdf.stringWidth(personal[self.contPersonal].upper(), "Helvetica-Bold", tamanioFuente)
+					tamanioDelTexto= self.pdf.stringWidth(self.personal[self.contPersonal].upper(), "Helvetica-Bold", tamanioFuente)
 				
 				xlista= self.hubicarHorizontalLetras(self.filasListaNombres[0], self.filasListaNombres[1], tamanioDelTexto)
 				ylista= self.hubicarVerticalLetras(self.columnasListaNombres[i], self.columnasListaNombres[i+1], tamanioFuente)
 				texto= self.pdf.beginText(xlista , ylista)
 				texto.setFillColor(HexColor(0xcc0000))
 				texto.setFont("Helvetica-Bold", tamanioFuente)
-				texto.textLine(str(personal[self.contPersonal].upper()))
+				texto.textLine(str(self.personal[self.contPersonal].upper()))
 				self.pdf.drawText(texto)
 			else:
 				break
 
 
-			if( self.contPersonal == len(personal)-1):
+			if( self.contPersonal == len(self.personal)-1):
 				self.contPersonal=0
 			else:
 				self.contPersonal+=1
@@ -396,7 +396,7 @@ class ControlDeGuardia(Tabla): # Hereda de la clase Tabla
 		
 		self.columnasLista.pop(0)# se elimina la primera fila
 
-	def escribirElCalendarioEnLaTabla(self, mesActual,  mesAnterior, mesSiguiente):
+	def escribirElCalendarioEnLaTabla(self, mesActual,  mesAnterior, mesSiguiente, dias):
 
 		cont1=0
 		for i in range(0, len(dias)):
@@ -635,7 +635,7 @@ if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 					esteControlDeGuardia.escribirNombreMesEnLaTabla(nombreMesActual)
 					esteControlDeGuardia.escribirElPersonalEnLaTabla()
 					esteControlDeGuardia.escribirDiasEnlaTabla(dias)
-					esteControlDeGuardia.escribirElCalendarioEnLaTabla(mesActual, mesAnterior, mesSiguiente)
+					esteControlDeGuardia.escribirElCalendarioEnLaTabla(mesActual, mesAnterior, mesSiguiente, dias)
 					#INSTANCIACION DE LA CLASE ControlDeGuardia
 					indexMeses+=1
 					contTablas-= 1
@@ -658,7 +658,7 @@ if __name__ == '__main__': # PUNTO DE ENTRADA PRINCIPAL
 				esteControlDeGuardia.escribirNombreMesEnLaTabla(nombreMesActual)
 				esteControlDeGuardia.escribirElPersonalEnLaTabla()
 				esteControlDeGuardia.escribirDiasEnlaTabla(dias)
-				esteControlDeGuardia.escribirElCalendarioEnLaTabla(mesActual, mesAnterior, mesSiguiente)
+				esteControlDeGuardia.escribirElCalendarioEnLaTabla(mesActual, mesAnterior, mesSiguiente, dias)
 				#INSTANCIACION DE LA CLASE ControlDeGuardia
 				indexMeses+=1
 				#contTablas-= 1
